@@ -34,7 +34,7 @@ jobs:
         key: ${{ secrets.SSH_KEY }}
         port: ${{ secrets.PORT }}
         script: |
-          cd /path/to/your/website
+          cd /media/server/Storage/www/games.com
           git pull origin main
           npm ci
           npm run build
