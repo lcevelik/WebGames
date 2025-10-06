@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SteadiCzech Games - Local Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: #1A1F2C;
+            color: white;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        .header h1 {
+            font-size: 3rem;
+            margin: 0;
+            background: linear-gradient(45deg, #9b87f5, #7E69AB);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .config-info {
+            background: #252A3A;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+        }
+        .config-info h2 {
+            color: #9b87f5;
+            margin-top: 0;
+        }
+        .config-item {
+            margin: 10px 0;
+            padding: 10px;
+            background: #1A1F2C;
+            border-radius: 5px;
+        }
+        .config-item strong {
+            color: #9b87f5;
+        }
+        .test-section {
+            background: #252A3A;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+        .test-button {
+            background: #9b87f5;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        .test-button:hover {
+            background: #7E69AB;
+        }
+        .result {
+            background: #1A1F2C;
+            padding: 10px;
+            border-radius: 5px;
+            margin-top: 10px;
+            font-family: monospace;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>SteadiCzech Games</h1>
+            <p>Local Development Test - Dynamic Configuration</p>
+        </div>
+
+        <div class="config-info">
+            <h2>🔧 Current Configuration</h2>
+            <div class="config-item">
+                <strong>Environment:</strong> <span id="environment">Loading...</span>
+            </div>
+            <div class="config-item">
+                <strong>Server URL:</strong> <span id="serverUrl">Loading...</span>
+            </div>
+            <div class="config-item">
+                <strong>API URL:</strong> <span id="apiUrl">Loading...</span>
+            </div>
+            <div class="config-item">
+                <strong>Games Base URL:</strong> <span id="gamesBaseUrl">Loading...</span>
+            </div>
+            <div class="config-item">
+                <strong>Default Image URL:</strong> <span id="defaultImageUrl">Loading...</span>
+            </div>
+        </div>
+
+        <div class="test-section">
+            <h2>🧪 Test Dynamic URLs</h2>
+            <button class="test-button" onclick="testGameImageUrl()">Test Game Image URL</button>
+            <button class="test-button" onclick="testGameUrl()">Test Game URL</button>
+            <button class="test-button" onclick="testApiUrl()">Test API URL</button>
+            <button class="test-button" onclick="loadGames()">Load Games from Server</button>
+            <div id="testResult" class="result" style="display: none;"></div>
+        </div>
+
+        <div class="test-section">
+            <h2>🎮 Games Test</h2>
+            <div id="gamesList"></div>
+        </div>
+    </div>
+
+    <script>
+        // Simulate the environment configuration
+        const isDevelopment = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+        
+        const config = {
+            serverUrl: isDevelopment ? 'http://localhost:3000' : 'https://games.steadiczech.com',
+            apiUrl: isDevelopment ? 'http://localhost:3000' : 'https://games.steadiczech.com',
+            gamesBaseUrl: isDevelopment ? 'http://localhost:3000/games' : 'https://games.steadiczech.com/games',
+            defaultImageUrl: isDevelopment ? 'http://localhost:3000/images/default-game-cover.png' : 'https://games.steadiczech.com/images/default-game-cover.png',
+            environment: isDevelopment ? 'development' : 'production'
+        };
+
+        // Helper functions
+        function getGameImageUrl(gameName) {
+            const folderName = gameName.toLowerCase().replace(/\s+/g, '-');
+            return `${config.gamesBaseUrl}/${folderName}/cover.png`;
+        }
+
+        function getGameUrl(gameName) {
+            const folderName = gameName.toLowerCase().replace(/\s+/g, '-');
+            return `${config.gamesBaseUrl}/${folderName}/index.html`;
+        }
+
+        function getApiUrl(endpoint) {
+            return `${config.apiUrl}/${endpoint}`;
+        }
+
+        // Display configuration
+        document.getElementById('environment').textContent = config.environment;
+        document.getElementById('serverUrl').textContent = config.serverUrl;
+        document.getElementById('apiUrl').textContent = config.apiUrl;
+        document.getElementById('gamesBaseUrl').textContent = config.gamesBaseUrl;
+        document.getElementById('defaultImageUrl').textContent = config.defaultImageUrl;
+
+        // Test functions
+        function testGameImageUrl() {
+            const result = getGameImageUrl('Save the Chikky');
+            showResult(`Game Image URL for "Save the Chikky": ${result}`);
+        }
+
+        function testGameUrl() {
+            const result = getGameUrl('Save the Chikky');
+            showResult(`Game URL for "Save the Chikky": ${result}`);
+        }
+
+        function testApiUrl() {
+            const result = getApiUrl('save-game.php');
+            showResult(`API URL for save-game.php: ${result}`);
+        }
+
+        function showResult(text) {
+            const resultDiv = document.getElementById('testResult');
+            resultDiv.textContent = text;
+            resultDiv.style.display = 'block';
+        }
+
+        async function loadGames() {
+            try {
+                showResult('Loading games from server...');
+                const response = await fetch(`${config.apiUrl}/games.json`);
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+                const games = await response.json();
+                showResult(`Successfully loaded ${games.length} games from server!`);
+                displayGames(games);
+            } catch (error) {
+                showResult(`Error loading games: ${error.message}`);
+            }
+        }
+
+        function displayGames(games) {
+            const gamesList = document.getElementById('gamesList');
+            gamesList.innerHTML = '<h3>Loaded Games:</h3>';
+            
+            games.forEach(game => {
+                const gameDiv = document.createElement('div');
+                gameDiv.style.cssText = 'background: #1A1F2C; padding: 15px; margin: 10px 0; border-radius: 5px;';
+                gameDiv.innerHTML = `
+                    <h4 style="color: #9b87f5; margin: 0 0 10px 0;">${game.title}</h4>
+                    <p style="margin: 5px 0; color: #ccc;">${game.description}</p>
+                    <p style="margin: 5px 0; font-size: 0.9em; color: #888;">Image: ${game.image}</p>
+                `;
+                gamesList.appendChild(gameDiv);
+            });
+        }
+
+        // Load games on page load
+        window.addEventListener('load', () => {
+            loadGames();
+        });
+    </script>
+</body>
+</html>

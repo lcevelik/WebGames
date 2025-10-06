@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SteadiCzech Games - React Test</title>
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background: #1A1F2C;
+            color: white;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        .header h1 {
+            font-size: 3rem;
+            margin: 0;
+            background: linear-gradient(45deg, #9b87f5, #7E69AB);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .games-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+        .game-card {
+            background: #252A3A;
+            border-radius: 10px;
+            overflow: hidden;
+            transition: transform 0.3s ease;
+            cursor: pointer;
+        }
+        .game-card:hover {
+            transform: translateY(-5px);
+        }
+        .game-image {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+        }
+        .game-content {
+            padding: 20px;
+        }
+        .game-title {
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin: 0 0 10px 0;
+            color: #9b87f5;
+        }
+        .game-description {
+            color: #ccc;
+            line-height: 1.5;
+        }
+        .config-info {
+            background: #252A3A;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+        }
+        .config-info h2 {
+            color: #9b87f5;
+            margin-top: 0;
+        }
+        .config-item {
+            margin: 10px 0;
+            padding: 10px;
+            background: #1A1F2C;
+            border-radius: 5px;
+        }
+        .config-item strong {
+            color: #9b87f5;
+        }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        // Environment Configuration (simulating the dynamic config)
+        const isDevelopment = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+        
+        const config = {
+            serverUrl: isDevelopment ? 'http://localhost:3000' : 'https://games.steadiczech.com',
+            apiUrl: isDevelopment ? 'http://localhost:3000' : 'https://games.steadiczech.com',
+            gamesBaseUrl: isDevelopment ? 'http://localhost:3000/games' : 'https://games.steadiczech.com/games',
+            defaultImageUrl: isDevelopment ? 'http://localhost:3000/images/default-game-cover.png' : 'https://games.steadiczech.com/images/default-game-cover.png',
+            environment: isDevelopment ? 'development' : 'production'
+        };
+
+        // Helper functions
+        function getGameImageUrl(gameName) {
+            const folderName = gameName.toLowerCase().replace(/\s+/g, '-');
+            return `${config.gamesBaseUrl}/${folderName}/cover.png`;
+        }
+
+        function getGameUrl(gameName) {
+            const folderName = gameName.toLowerCase().replace(/\s+/g, '-');
+            return `${config.gamesBaseUrl}/${folderName}/index.html`;
+        }
+
+        // Game Card Component
+        function GameCard({ title, image, description, url }) {
+            const handlePlayGame = () => {
+                if (url) {
+                    window.open(url, '_blank');
+                } else {
+                    const gameUrl = getGameUrl(title);
+                    window.open(gameUrl, '_blank');
+                }
+            };
+
+            return (
+                <div className="game-card" onClick={handlePlayGame}>
+                    <img 
+                        src={image} 
+                        alt={title}
+                        className="game-image"
+                        onError={(e) => {
+                            e.target.src = config.defaultImageUrl;
+                        }}
+                    />
+                    <div className="game-content">
+                        <h3 className="game-title">{title}</h3>
+                        <p className="game-description">{description}</p>
+                    </div>
+                </div>
+            );
+        }
+
+        // Games Grid Component
+        function GamesGrid() {
+            const [games, setGames] = React.useState([]);
+            const [loading, setLoading] = React.useState(true);
+
+            React.useEffect(() => {
+                fetchGames();
+            }, []);
+
+            const fetchGames = async () => {
+                try {
+                    const response = await fetch(`${config.apiUrl}/games.json`);
+                    if (!response.ok) {
+                        throw new Error('Failed to fetch games');
+                    }
+                    const data = await response.json();
+                    
+                    // Add demo games
+                    const gamesWithDemo = [
+                        {
+                            title: "Save the Chikky",
+                            image: getGameImageUrl("game1"),
+                            description: "Help Chikky to escape from crabs, how long can Chikky run?",
+                        },
+                        {
+                            title: "Enchanted Quest",
+                            image: getGameImageUrl("ench"),
+                            description: "Embark on a magical journey through mystical realms",
+                            url: "https://www.arcanemirage.com/project/2928"
+                        },
+                        ...data
+                    ];
+                    setGames(gamesWithDemo);
+                } catch (error) {
+                    console.error('Error fetching games:', error);
+                    // Fallback to demo games
+                    setGames([
+                        {
+                            title: "Save the Chikky",
+                            image: getGameImageUrl("game1"),
+                            description: "Help Chikky to escape from crabs, how long can Chikky run?",
+                        },
+                        {
+                            title: "Enchanted Quest",
+                            image: getGameImageUrl("ench"),
+                            description: "Embark on a magical journey through mystical realms",
+                            url: "https://www.arcanemirage.com/project/2928"
+                        }
+                    ]);
+                } finally {
+                    setLoading(false);
+                }
+            };
+
+            if (loading) {
+                return <div>Loading games...</div>;
+            }
+
+            return (
+                <div className="games-grid">
+                    {games.map((game, index) => (
+                        <GameCard
+                            key={index}
+                            title={game.title}
+                            image={game.image}
+                            description={game.description}
+                            url={game.url}
+                        />
+                    ))}
+                </div>
+            );
+        }
+
+        // Main App Component
+        function App() {
+            return (
+                <div className="container">
+                    <div className="header">
+                        <h1>SteadiCzech Games</h1>
+                        <p>Dynamic Configuration Test - React Components</p>
+                    </div>
+
+                    <div className="config-info">
+                        <h2>🔧 Current Configuration</h2>
+                        <div className="config-item">
+                            <strong>Environment:</strong> {config.environment}
+                        </div>
+                        <div className="config-item">
+                            <strong>Server URL:</strong> {config.serverUrl}
+                        </div>
+                        <div className="config-item">
+                            <strong>API URL:</strong> {config.apiUrl}
+                        </div>
+                        <div className="config-item">
+                            <strong>Games Base URL:</strong> {config.gamesBaseUrl}
+                        </div>
+                        <div className="config-item">
+                            <strong>Default Image URL:</strong> {config.defaultImageUrl}
+                        </div>
+                    </div>
+
+                    <h2>🎮 Games</h2>
+                    <GamesGrid />
+                </div>
+            );
+        }
+
+        // Render the app
+        ReactDOM.render(<App />, document.getElementById('root'));
+    </script>
+</body>
+</html>

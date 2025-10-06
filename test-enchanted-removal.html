@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test - Enchanted Quest Removal</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .test { margin: 10px 0; padding: 10px; border: 1px solid #ccc; }
+        .pass { background-color: #d4edda; border-color: #c3e6cb; }
+        .fail { background-color: #f8d7da; border-color: #f5c6cb; }
+    </style>
+</head>
+<body>
+    <h1>🧪 Testing Enchanted Quest Removal</h1>
+    
+    <div class="test" id="test1">
+        <h3>Test 1: Check games.json</h3>
+        <p>Loading games from server...</p>
+    </div>
+    
+    <div class="test" id="test2">
+        <h3>Test 2: Check main page</h3>
+        <p>Loading main page...</p>
+    </div>
+    
+    <div class="test" id="test3">
+        <h3>Test 3: Verify no Enchanted Quest references</h3>
+        <p>Checking for any remaining references...</p>
+    </div>
+
+    <script>
+        // Test 1: Check games.json
+        fetch('/games.json')
+            .then(response => response.json())
+            .then(games => {
+                const test1 = document.getElementById('test1');
+                const hasEnchanted = games.some(game => 
+                    game.title.toLowerCase().includes('enchanted') || 
+                    game.title.toLowerCase().includes('quest')
+                );
+                
+                if (hasEnchanted) {
+                    test1.className = 'test fail';
+                    test1.innerHTML += '<p>❌ FAIL: Found Enchanted Quest in games.json</p>';
+                } else {
+                    test1.className = 'test pass';
+                    test1.innerHTML += '<p>✅ PASS: No Enchanted Quest found in games.json</p>';
+                    test1.innerHTML += '<p>Games found: ' + games.map(g => g.title).join(', ') + '</p>';
+                }
+            })
+            .catch(error => {
+                document.getElementById('test1').innerHTML += '<p>❌ ERROR: ' + error.message + '</p>';
+            });
+
+        // Test 2: Check main page
+        fetch('/')
+            .then(response => response.text())
+            .then(html => {
+                const test2 = document.getElementById('test2');
+                const hasEnchanted = html.toLowerCase().includes('enchanted') || 
+                                   html.toLowerCase().includes('quest');
+                
+                if (hasEnchanted) {
+                    test2.className = 'test fail';
+                    test2.innerHTML += '<p>❌ FAIL: Found Enchanted Quest references in main page</p>';
+                } else {
+                    test2.className = 'test pass';
+                    test2.innerHTML += '<p>✅ PASS: No Enchanted Quest references in main page</p>';
+                }
+            })
+            .catch(error => {
+                document.getElementById('test2').innerHTML += '<p>❌ ERROR: ' + error.message + '</p>';
+            });
+
+        // Test 3: Check JavaScript file
+        fetch('/assets/index-31ytW1nM.js')
+            .then(response => response.text())
+            .then(js => {
+                const test3 = document.getElementById('test3');
+                const hasEnchanted = js.toLowerCase().includes('enchanted') || 
+                                   js.toLowerCase().includes('quest');
+                
+                if (hasEnchanted) {
+                    test3.className = 'test fail';
+                    test3.innerHTML += '<p>❌ FAIL: Found Enchanted Quest references in JavaScript</p>';
+                } else {
+                    test3.className = 'test pass';
+                    test3.innerHTML += '<p>✅ PASS: No Enchanted Quest references in JavaScript</p>';
+                }
+            })
+            .catch(error => {
+                document.getElementById('test3').innerHTML += '<p>❌ ERROR: ' + error.message + '</p>';
+            });
+    </script>
+</body>
+</html>

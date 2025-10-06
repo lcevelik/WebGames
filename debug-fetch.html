@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Debug Fetch - SteadiCzech Games</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: #1A1F2C;
+            color: white;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        .debug-section {
+            background: #252A3A;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+        .debug-section h2 {
+            color: #9b87f5;
+            margin-top: 0;
+        }
+        .test-button {
+            background: #9b87f5;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        .test-button:hover {
+            background: #7E69AB;
+        }
+        .result {
+            background: #1A1F2C;
+            padding: 15px;
+            border-radius: 5px;
+            margin-top: 10px;
+            font-family: monospace;
+            white-space: pre-wrap;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        .error {
+            color: #ff6b6b;
+        }
+        .success {
+            color: #51cf66;
+        }
+        .info {
+            color: #74c0fc;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔍 Debug Fetch - SteadiCzech Games</h1>
+        
+        <div class="debug-section">
+            <h2>🌐 Environment Detection</h2>
+            <div id="envInfo"></div>
+        </div>
+
+        <div class="debug-section">
+            <h2>🧪 Fetch Tests</h2>
+            <button class="test-button" onclick="testGamesJson()">Test games.json</button>
+            <button class="test-button" onclick="testCORS()">Test CORS Headers</button>
+            <button class="test-button" onclick="testAllEndpoints()">Test All Endpoints</button>
+            <div id="fetchResult" class="result" style="display: none;"></div>
+        </div>
+
+        <div class="debug-section">
+            <h2>📊 Network Information</h2>
+            <div id="networkInfo"></div>
+        </div>
+    </div>
+
+    <script>
+        // Environment detection
+        const isDevelopment = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+        
+        const config = {
+            serverUrl: isDevelopment ? 'http://localhost:3000' : 'https://games.steadiczech.com',
+            apiUrl: isDevelopment ? 'http://localhost:3000' : 'https://games.steadiczech.com',
+            gamesBaseUrl: isDevelopment ? 'http://localhost:3000/games' : 'https://games.steadiczech.com/games',
+            defaultImageUrl: isDevelopment ? 'http://localhost:3000/images/default-game-cover.png' : 'https://games.steadiczech.com/images/default-game-cover.png',
+            environment: isDevelopment ? 'development' : 'production'
+        };
+
+        // Display environment info
+        document.getElementById('envInfo').innerHTML = `
+            <div><strong>Environment:</strong> ${config.environment}</div>
+            <div><strong>Server URL:</strong> ${config.serverUrl}</div>
+            <div><strong>API URL:</strong> ${config.apiUrl}</div>
+            <div><strong>Current URL:</strong> ${window.location.href}</div>
+            <div><strong>Protocol:</strong> ${window.location.protocol}</div>
+            <div><strong>Hostname:</strong> ${window.location.hostname}</div>
+            <div><strong>Port:</strong> ${window.location.port || 'default'}</div>
+        `;
+
+        function showResult(text, type = 'info') {
+            const resultDiv = document.getElementById('fetchResult');
+            resultDiv.textContent = text;
+            resultDiv.className = `result ${type}`;
+            resultDiv.style.display = 'block';
+        }
+
+        async function testGamesJson() {
+            showResult('Testing games.json...', 'info');
+            
+            try {
+                const url = `${config.apiUrl}/games.json`;
+                console.log('Fetching from:', url);
+                
+                const response = await fetch(url, {
+                    method: 'GET',
+                    headers: {
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                console.log('Response status:', response.status);
+                console.log('Response headers:', [...response.headers.entries()]);
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+                
+                const data = await response.json();
+                showResult(`✅ SUCCESS!\n\nStatus: ${response.status}\nURL: ${url}\nData: ${JSON.stringify(data, null, 2)}`, 'success');
+                
+            } catch (error) {
+                console.error('Fetch error:', error);
+                showResult(`❌ ERROR!\n\nError: ${error.message}\nType: ${error.name}\nStack: ${error.stack}`, 'error');
+            }
+        }
+
+        async function testCORS() {
+            showResult('Testing CORS headers...', 'info');
+            
+            try {
+                const url = `${config.apiUrl}/games.json`;
+                const response = await fetch(url, {
+                    method: 'OPTIONS',
+                    headers: {
+                        'Origin': window.location.origin,
+                        'Access-Control-Request-Method': 'GET',
+                        'Access-Control-Request-Headers': 'Content-Type'
+                    }
+                });
+                
+                const corsHeaders = {
+                    'Access-Control-Allow-Origin': response.headers.get('Access-Control-Allow-Origin'),
+                    'Access-Control-Allow-Methods': response.headers.get('Access-Control-Allow-Methods'),
+                    'Access-Control-Allow-Headers': response.headers.get('Access-Control-Allow-Headers')
+                };
+                
+                showResult(`CORS Headers:\n${JSON.stringify(corsHeaders, null, 2)}`, 'info');
+                
+            } catch (error) {
+                showResult(`CORS Test Error: ${error.message}`, 'error');
+            }
+        }
+
+        async function testAllEndpoints() {
+            showResult('Testing all endpoints...', 'info');
+            
+            const endpoints = [
+                '/games.json',
+                '/test-local.html',
+                '/test-react.html',
+                '/index.html'
+            ];
+            
+            let results = '';
+            
+            for (const endpoint of endpoints) {
+                try {
+                    const url = `${config.apiUrl}${endpoint}`;
+                    const response = await fetch(url);
+                    results += `✅ ${endpoint}: ${response.status} ${response.statusText}\n`;
+                } catch (error) {
+                    results += `❌ ${endpoint}: ${error.message}\n`;
+                }
+            }
+            
+            showResult(results, 'info');
+        }
+
+        // Display network information
+        document.getElementById('networkInfo').innerHTML = `
+            <div><strong>User Agent:</strong> ${navigator.userAgent}</div>
+            <div><strong>Online:</strong> ${navigator.onLine ? 'Yes' : 'No'}</div>
+            <div><strong>Connection:</strong> ${navigator.connection ? navigator.connection.effectiveType : 'Unknown'}</div>
+            <div><strong>Cookies Enabled:</strong> ${navigator.cookieEnabled ? 'Yes' : 'No'}</div>
+        `;
+
+        // Auto-run tests on load
+        window.addEventListener('load', () => {
+            console.log('Debug page loaded');
+            console.log('Config:', config);
+            testGamesJson();
+        });
+    </script>
+</body>
+</html>
