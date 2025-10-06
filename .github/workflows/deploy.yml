@@ -33,6 +33,8 @@ jobs:
         username: ${{ secrets.USERNAME }}
         key: ${{ secrets.SSH_KEY }}
         port: ${{ secrets.PORT }}
+        timeout: 60s
+        command_timeout: 15m
         script: |
           cd /media/server/Storage/www/games.com
           git pull origin main
