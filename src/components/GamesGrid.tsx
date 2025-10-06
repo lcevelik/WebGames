@@ -69,17 +69,44 @@ export const GamesGrid = ({ selectedCategories }: GamesGridProps) => {
   };
 
   return (
-    <section className="container mx-auto px-4 py-4">
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-        {games.map((game, index) => (
-          <GameCard
-            key={index}
-            title={game.title}
-            image={game.image}
-            description={game.description}
-            url={game.url}
-          />
-        ))}
+    <section className="relative bg-black py-20">
+      {/* Background elements */}
+      <div className="absolute inset-0 bg-gradient-to-b from-black via-gray-900/50 to-black"></div>
+      <div className="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-gray-800 to-transparent"></div>
+      
+      <div className="relative container mx-auto px-4">
+        {/* Section header */}
+        <div className="text-center mb-16">
+          <h2 className="text-4xl md:text-6xl font-bold text-white mb-6">
+            Featured Games
+          </h2>
+          <p className="text-xl text-gray-400 max-w-2xl mx-auto">
+            Discover amazing indie games created by developers around the world
+          </p>
+        </div>
+        
+        {/* Masonry-style grid */}
+        <div className="columns-1 md:columns-2 lg:columns-3 xl:columns-4 gap-6 space-y-6">
+          {games.map((game, index) => (
+            <div 
+              key={index}
+              className="break-inside-avoid mb-6"
+              style={{
+                animationDelay: `${index * 100}ms`
+              }}
+            >
+              <GameCard
+                title={game.title}
+                image={game.image}
+                description={game.description}
+                url={game.url}
+              />
+            </div>
+          ))}
+        </div>
+        
+        {/* Bottom gradient fade */}
+        <div className="absolute bottom-0 left-0 w-full h-32 bg-gradient-to-t from-black to-transparent pointer-events-none"></div>
       </div>
     </section>
   );
