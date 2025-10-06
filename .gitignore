@@ -1,1 +1,5 @@
 node_modules/
+# Large game files
+games/*/*.wasm
+games/*/*.data
+games/*/*.exe
