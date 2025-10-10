@@ -18,9 +18,9 @@ NC='\033[0m'
 echo -e "${GREEN}🚀 Quick Deploy to SteadiCzech Server${NC}"
 echo "=================================="
 
-# Build the project
-echo "Building project..."
-npm run build
+# Build the project for production
+echo "Building project for production..."
+VITE_ENVIRONMENT=production npm run build
 
 # Deploy using rsync
 echo "Deploying to server..."

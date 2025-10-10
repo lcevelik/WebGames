@@ -79,9 +79,9 @@ build_project() {
         npm install
     fi
     
-    # Build the project
-    print_status "Running build command..."
-    npm run build
+    # Build the project for production
+    print_status "Running build command for production..."
+    VITE_ENVIRONMENT=production npm run build
     
     if [ $? -ne 0 ]; then
         print_error "Build failed! Please check for errors."
