@@ -5,21 +5,168 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>SteadiCzech Games</title>
     <meta name="description" content="SteadiCzech Games - Browser-based Gaming Marketplace" />
-    <meta name="author" content="Lovable" />
+    <meta name="author" content="SteadiCzech" />
     <meta property="og:image" content="/og-image.png" />
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Urbanist:wght@400;500;600;700&display=swap" />
-    <script type="module" crossorigin src="/assets/index-31ytW1nM.js"></script>
-    <link rel="stylesheet" crossorigin href="/assets/index-C5Xt6Kin.css">
-
-
-<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8737160724579846"
-     crossorigin="anonymous"></script>
-
-
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      
+      body {
+        font-family: 'Urbanist', sans-serif;
+        background: linear-gradient(135deg, #0f0f0f 0%, #1a1a1a 100%);
+        color: white;
+        min-height: 100vh;
+      }
+      
+      .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 2rem;
+      }
+      
+      .header {
+        text-align: center;
+        margin-bottom: 3rem;
+      }
+      
+      .header h1 {
+        font-size: 3rem;
+        font-weight: 700;
+        background: linear-gradient(45deg, #3b82f6, #8b5cf6, #ec4899);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        margin-bottom: 1rem;
+      }
+      
+      .header p {
+        font-size: 1.2rem;
+        color: #a1a1aa;
+        margin-bottom: 2rem;
+      }
+      
+      .games-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 2rem;
+        margin-top: 2rem;
+      }
+      
+      .game-card {
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 1rem;
+        padding: 1.5rem;
+        transition: all 0.3s ease;
+        cursor: pointer;
+        text-decoration: none;
+        color: inherit;
+      }
+      
+      .game-card:hover {
+        transform: translateY(-5px);
+        background: rgba(255, 255, 255, 0.1);
+        border-color: rgba(59, 130, 246, 0.5);
+      }
+      
+      .game-image {
+        width: 100%;
+        height: 200px;
+        object-fit: cover;
+        border-radius: 0.5rem;
+        margin-bottom: 1rem;
+      }
+      
+      .game-title {
+        font-size: 1.5rem;
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+      }
+      
+      .game-description {
+        color: #a1a1aa;
+        line-height: 1.6;
+      }
+      
+      .play-button {
+        background: linear-gradient(45deg, #3b82f6, #8b5cf6);
+        color: white;
+        border: none;
+        padding: 0.75rem 1.5rem;
+        border-radius: 0.5rem;
+        font-weight: 600;
+        margin-top: 1rem;
+        cursor: pointer;
+        transition: all 0.3s ease;
+      }
+      
+      .play-button:hover {
+        transform: scale(1.05);
+        box-shadow: 0 10px 25px rgba(59, 130, 246, 0.3);
+      }
+      
+      .loading {
+        text-align: center;
+        color: #a1a1aa;
+        margin: 2rem 0;
+      }
+    </style>
   </head>
-
   <body>
-    <div id="root"></div>
-    <script src="https://cdn.gpteng.co/gptengineer.js" type="module"></script>
+    <div class="container">
+      <div class="header">
+        <h1>SteadiCzech Games</h1>
+        <p>Browser-based Gaming Marketplace</p>
+      </div>
+      
+      <div id="games-container">
+        <div class="loading">Loading games...</div>
+      </div>
+    </div>
+
+    <script>
+      // Load games from the server
+      async function loadGames() {
+        try {
+          const response = await fetch('/games.json');
+          if (!response.ok) {
+            throw new Error('Failed to fetch games');
+          }
+          const games = await response.json();
+          displayGames(games);
+        } catch (error) {
+          console.error('Error loading games:', error);
+          document.getElementById('games-container').innerHTML = 
+            '<div class="loading">Error loading games. Please try again later.</div>';
+        }
+      }
+      
+      function displayGames(games) {
+        const container = document.getElementById('games-container');
+        container.innerHTML = '<div class="games-grid">' + 
+          games.map(game => `
+            <div class="game-card" onclick="playGame('${game.title}')">
+              <img src="${game.image}" alt="${game.title}" class="game-image" onerror="this.src='/placeholder.svg'">
+              <h3 class="game-title">${game.title}</h3>
+              <p class="game-description">${game.description}</p>
+              <button class="play-button">Start Playing</button>
+            </div>
+          `).join('') + 
+          '</div>';
+      }
+      
+      function playGame(title) {
+        // Convert title to folder name (lowercase, replace spaces with dashes)
+        const folderName = title.toLowerCase().replace(/\s+/g, '-');
+        const gameUrl = `/games/${folderName}/index.html`;
+        window.open(gameUrl, '_blank');
+      }
+      
+      // Load games when page loads
+      loadGames();
+    </script>
   </body>
 </html>
