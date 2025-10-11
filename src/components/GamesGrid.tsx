@@ -15,19 +15,7 @@ interface GamesGridProps {
 }
 
 export const GamesGrid = ({ selectedCategories }: GamesGridProps) => {
-  const [games, setGames] = useState<Game[]>([
-    {
-      title: "Save the Chikky",
-      image: getGameImageUrl("game1"),
-      description: "Help Chikky to escape from crabs, how long can Chikky run?",
-    },
-    {
-      title: "Enchanted Quest",
-      image: getGameImageUrl("ench"),
-      description: "Embark on a magical journey through mystical realms",
-      url: "https://www.arcanemirage.com/project/2928"
-    }
-  ]);
+  const [games, setGames] = useState<Game[]>([]);
   const { toast } = useToast();
 
   useEffect(() => {
@@ -42,27 +30,12 @@ export const GamesGrid = ({ selectedCategories }: GamesGridProps) => {
         throw new Error('Failed to fetch games');
       }
       const data = await response.json();
-      // Ensure the demo games are always included
-      const gamesWithDemo = [
-        {
-          title: "Save the Chikky",
-          image: getGameImageUrl("game1"),
-          description: "Help Chikky to escape from crabs, how long can Chikky run?",
-        },
-        {
-          title: "Enchanted Quest",
-          image: getGameImageUrl("ench"),
-          description: "Embark on a magical journey through mystical realms",
-          url: "https://www.arcanemirage.com/project/2928"
-        },
-        ...data
-      ];
-      setGames(gamesWithDemo);
+      setGames(data);
     } catch (error) {
       console.error('Error fetching games:', error);
       toast({
         title: "Error",
-        description: "Failed to load games from server. Showing demo games only.",
+        description: "Failed to load games from server.",
         variant: "destructive",
       });
     }
