@@ -5,8 +5,8 @@ import { VersionCounter } from "@/components/VersionCounter";
 
 const Index = () => {
   return (
-    <div className="min-h-screen bg-black">
-      <div className="relative">
+    <div className="min-h-screen bg-background">
+      <div className="bg-secondary pb-20">
         <VersionCounter />
         <HeroSection />
         <GamesGrid selectedCategories={[]} />

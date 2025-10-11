@@ -1,7 +1,4 @@
 <?php
-// Include server configuration
-require_once 'config.php';
-
 // Enable CORS
 header("Access-Control-Allow-Origin: *");
 header("Access-Control-Allow-Methods: POST, OPTIONS");
@@ -42,7 +39,7 @@ try {
     }
 
     // Read existing games
-    $gamesFile = ServerConfig::getGamesJsonPath();
+    $gamesFile = 'games.json';
     $games = [];
     
     if (file_exists($gamesFile)) {
@@ -61,7 +58,7 @@ try {
     $serverPath = $_SERVER['DOCUMENT_ROOT'] . $imagePath;
     if (!file_exists($serverPath)) {
         // Use default image instead of throwing an error
-        $data->image = ServerConfig::getDefaultImageUrl();
+        $data->image = "http://172.251.232.135/images/default-game-cover.png";
     }
 
     // Add new game

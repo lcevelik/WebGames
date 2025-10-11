@@ -10,7 +10,6 @@ import {
 import { useToast } from "@/hooks/use-toast";
 import { GameForm } from "./GameForm";
 import { SaveGameButton } from "./SaveGameButton";
-import { config, getGameImageUrl, getApiUrl } from "@/config/environment";
 
 export const AddGameDialog = () => {
   const [gameName, setGameName] = useState("");
@@ -23,14 +22,14 @@ export const AddGameDialog = () => {
       const folderName = gameName.toLowerCase().replace(/\s+/g, '-');
       const gameData = {
         title: gameName,
-        image: getGameImageUrl(folderName),
+        image: `${import.meta.env.VITE_SERVER_URL}/games/${folderName}/cover.png`,
         description: description,
         url: gameUrl || undefined
       };
 
       console.log('Attempting to save game with data:', gameData);
 
-      const response = await fetch(getApiUrl('save-game.php'), {
+      const response = await fetch(`${import.meta.env.VITE_SERVER_URL}/save-game.php`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
