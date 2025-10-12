@@ -30,5 +30,5 @@ export default defineConfig(({ mode }) => ({
     },
   },
   publicDir: 'public',
-  assetsInclude: ['**/*.html', '**/*.wasm', '**/*.data'],
+  assetsInclude: ['**/*.wasm', '**/*.data'],
 }));
