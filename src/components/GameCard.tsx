@@ -13,13 +13,30 @@ export const GameCard = ({ title, image, description, url }: GameCardProps) => {
   const [imageError, setImageError] = useState(false);
 
   const handlePlayGame = () => {
-    if (url) {
-      window.open(url, '_blank');
-    } else if (title === "Save the Chikky") {
-      window.open('https://steadiczech.com/games/game1/index.html', '_blank');
-    } else {
-      const gameUrl = url || `${import.meta.env.VITE_SERVER_URL}/games/${title.toLowerCase().replace(/\s+/g, '-')}/index.html`;
-      window.open(gameUrl, '_blank');
+    try {
+      if (url) {
+        console.log('Opening external game:', url);
+        window.open(url, '_blank');
+      } else {
+        const gameUrl = `/games/${title.toLowerCase().replace(/\s+/g, '-')}/index.html`;
+        console.log('Opening local game:', gameUrl);
+        console.log('Game title:', title);
+        console.log('Current protocol:', window.location.protocol);
+        console.log('Current host:', window.location.host);
+        
+        const gameWindow = window.open(gameUrl, '_blank');
+        
+        if (!gameWindow || gameWindow.closed || typeof gameWindow.closed === 'undefined') {
+          console.error('Failed to open game window - popup blocked?');
+          alert('Popup blocked! Please allow popups for this site and try again.');
+          return;
+        }
+        
+        console.log('Game window opened successfully');
+      }
+    } catch (error) {
+      console.error('Error opening game:', error);
+      alert('Error opening game: ' + error.message);
     }
   };
 
@@ -36,7 +53,7 @@ export const GameCard = ({ title, image, description, url }: GameCardProps) => {
     >
       <div className="aspect-[16/9] overflow-hidden">
         <img
-          src={imageError ? `${import.meta.env.VITE_SERVER_URL}/images/default-game-cover.png` : image}
+          src={imageError ? '/placeholder.svg' : image}
           alt={title}
           onError={handleImageError}
           className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"

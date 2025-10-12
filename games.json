@@ -1,13 +1,17 @@
 [
-   
     {
         "title": "Defence",
-        "image": "https:\/\/games.steadiczech.com\/games\/defence\/cover.png",
+        "image": "/games/defence/cover.png",
         "description": "Defend agains hordes of enemies, Fun little strategy game. Created by Epic Games"
     },
     {
         "title": "Shootout",
-        "image": "https:\/\/games.steadiczech.com\/games\/shootout\/cover.png",
+        "image": "/games/shootout/cover.png",
         "description": "As Cowboy try to get all the red boxes before time runs out."
+    },
+    {
+        "title": "Game1",
+        "image": "/games/game1/cover.png",
+        "description": "A fun interactive game created with Scratch"
     }
 ]

@@ -14,19 +14,7 @@ interface GamesGridProps {
 }
 
 export const GamesGrid = ({ selectedCategories }: GamesGridProps) => {
-  const [games, setGames] = useState<Game[]>([
-    {
-      title: "Save the Chikky",
-      image: "https://steadiczech.com/games/game1/cover.png",
-      description: "Help Chikky to escape from crabs, how long can Chikky run?",
-    },
-    {
-      title: "Enchanted Quest",
-      image: "https://steadiczech.com/games/ench/cover.png",
-      description: "Embark on a magical journey through mystical realms",
-      url: "https://www.arcanemirage.com/project/2928"
-    }
-  ]);
+  const [games, setGames] = useState<Game[]>([]);
   const { toast } = useToast();
 
   useEffect(() => {
@@ -36,32 +24,19 @@ export const GamesGrid = ({ selectedCategories }: GamesGridProps) => {
 
   const fetchGames = async () => {
     try {
-      const response = await fetch(`${import.meta.env.VITE_SERVER_URL}/games.json`);
+      // Add cache-busting parameter to force fresh data
+      const response = await fetch(`/games.json?t=${Date.now()}`);
       if (!response.ok) {
         throw new Error('Failed to fetch games');
       }
       const data = await response.json();
-      // Ensure the demo games are always included
-      const gamesWithDemo = [
-        {
-          title: "Save the Chikky",
-          image: "https://steadiczech.com/games/game1/cover.png",
-          description: "Help Chikky to escape from crabs, how long can Chikky run?",
-        },
-        {
-          title: "Enchanted Quest",
-          image: "https://steadiczech.com/games/ench/cover.png",
-          description: "Embark on a magical journey through mystical realms",
-          url: "https://www.arcanemirage.com/project/2928"
-        },
-        ...data
-      ];
-      setGames(gamesWithDemo);
+      console.log('Loaded games:', data);
+      setGames(data);
     } catch (error) {
       console.error('Error fetching games:', error);
       toast({
         title: "Error",
-        description: "Failed to load games from server. Showing demo games only.",
+        description: "Failed to load games from server.",
         variant: "destructive",
       });
     }
