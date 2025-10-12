@@ -40,10 +40,29 @@ This project provides a gaming marketplace platform for hosting and managing bro
 
 ## Adding Games
 
+### Quick Method (Recommended)
+Use the automated script to create a new game:
+
+```bash
+./add-game.sh "Your Game Name" "game-folder-name"
+```
+
+Example:
+```bash
+./add-game.sh "Space Adventure" "space-adventure"
+```
+
+### Manual Method
 1. Create a new folder in `/games/[game-name]/`
-2. Add `index.html` and `cover.png` files
-3. Update `/games.json` with game metadata
-4. Restart the development server
+2. Add `index.html` with proper `<title>` tag (should match game name)
+3. Add `cover.png` file
+4. Update `/games.json` with game metadata
+5. Restart the development server
+
+### Game Title Requirements
+- Each game's `index.html` must have a `<title>` tag with the game name
+- The title will appear in the browser tab when the game is opened
+- Use clear, descriptive names for better user experience
 
 ## Development
 
