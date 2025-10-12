@@ -26,46 +26,39 @@ export const GamesGrid = ({ selectedCategories }: GamesGridProps) => {
 
   const fetchGames = async () => {
     try {
-      // Load games from server
-      const response = await fetch(`/games.json?t=${Date.now()}`);
-      let serverGames: Game[] = [];
+      // Load games from server API
+      const response = await fetch('http://localhost:3002/api/games');
       
       if (response.ok) {
-        serverGames = await response.json();
-        console.log('Loaded games from server:', serverGames);
+        const serverGames = await response.json();
+        console.log('Loaded games from server API:', serverGames);
+        setGames(serverGames);
       } else {
-        console.warn('Failed to load games from server, using localStorage only');
+        throw new Error('Failed to load games from server');
       }
-
-      // Load games from localStorage
-      const localGames = JSON.parse(localStorage.getItem('games') || '[]');
-      console.log('Loaded games from localStorage:', localGames);
-
-      // Combine both sources, with localStorage games taking precedence for duplicates
-      const allGames = [...serverGames];
-      localGames.forEach((localGame: Game) => {
-        // Check if this game already exists (by title)
-        const exists = allGames.some(game => game.title === localGame.title);
-        if (!exists) {
-          allGames.push(localGame);
-        }
-      });
-
-      console.log('Combined games:', allGames);
-      setGames(allGames);
     } catch (error) {
-      console.error('Error fetching games:', error);
+      console.error('Error fetching games from server:', error);
       
-      // Fallback to localStorage only
-      const localGames = JSON.parse(localStorage.getItem('games') || '[]');
-      console.log('Using localStorage games as fallback:', localGames);
-      setGames(localGames);
-      
-      toast({
-        title: "Warning",
-        description: "Using locally saved games. Some games may not be available.",
-        variant: "destructive",
-      });
+      // Fallback to static games.json file
+      try {
+        const response = await fetch(`/games.json?t=${Date.now()}`);
+        if (response.ok) {
+          const staticGames = await response.json();
+          console.log('Using static games.json as fallback:', staticGames);
+          setGames(staticGames);
+        } else {
+          throw new Error('Failed to load static games');
+        }
+      } catch (fallbackError) {
+        console.error('Error loading static games:', fallbackError);
+        setGames([]);
+        
+        toast({
+          title: "Error",
+          description: "Failed to load games. Please check if the server is running.",
+          variant: "destructive",
+        });
+      }
     }
   };
 

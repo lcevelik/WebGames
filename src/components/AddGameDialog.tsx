@@ -31,18 +31,23 @@ export const AddGameDialog = ({ onGameAdded }: AddGameDialogProps) => {
         url: gameUrl || undefined
       };
 
-      console.log('Adding game to local storage:', gameData);
+      console.log('Adding game to server:', gameData);
 
-      // Get existing games from localStorage or default to empty array
-      const existingGames = JSON.parse(localStorage.getItem('games') || '[]');
-      
-      // Add new game to the list
-      const updatedGames = [...existingGames, gameData];
-      
-      // Save to localStorage
-      localStorage.setItem('games', JSON.stringify(updatedGames));
+      const response = await fetch('http://localhost:3002/api/games', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(gameData),
+      });
 
-      console.log('Game added successfully to localStorage');
+      const result = await response.json();
+
+      if (!response.ok) {
+        throw new Error(result.error || 'Failed to add game');
+      }
+
+      console.log('Game added successfully to server:', result);
 
       toast({
         title: "Success",
