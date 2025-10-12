@@ -10,6 +10,7 @@ import {
 import { useToast } from "@/hooks/use-toast";
 import { GameForm } from "./GameForm";
 import { SaveGameButton } from "./SaveGameButton";
+import { API_ENDPOINTS } from "@/config/api";
 
 interface AddGameDialogProps {
   onGameAdded?: () => void;
@@ -33,7 +34,7 @@ export const AddGameDialog = ({ onGameAdded }: AddGameDialogProps) => {
 
       console.log('Adding game to server:', gameData);
 
-      const response = await fetch('http://localhost:3002/api/games', {
+      const response = await fetch(API_ENDPOINTS.GAMES, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

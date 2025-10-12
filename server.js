@@ -198,8 +198,8 @@ const server = http.createServer(async (req, res) => {
 });
 
 // Start server
-server.listen(PORT, () => {
-  console.log(`Game server running on http://localhost:${PORT}`);
+server.listen(PORT, '0.0.0.0', () => {
+  console.log(`Game server running on http://0.0.0.0:${PORT}`);
   console.log('Available endpoints:');
   console.log('  GET    /api/games     - Get all games');
   console.log('  POST   /api/games     - Add new game');
