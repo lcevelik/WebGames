@@ -1,7 +1,11 @@
 import { Gamepad2, Github } from "lucide-react";
 import { AddGameDialog } from "./AddGameDialog";
 
-export const Footer = () => {
+interface FooterProps {
+  onGameAdded?: () => void;
+}
+
+export const Footer = ({ onGameAdded }: FooterProps) => {
   return (
     <footer className="bg-secondary mt-20 py-8">
       <div className="container mx-auto px-4">
@@ -17,7 +21,7 @@ export const Footer = () => {
           </div>
         </div>
         <div className="mt-6 flex justify-center">
-          <AddGameDialog />
+          <AddGameDialog onGameAdded={onGameAdded} />
         </div>
       </div>
     </footer>

@@ -11,7 +11,11 @@ import { useToast } from "@/hooks/use-toast";
 import { GameForm } from "./GameForm";
 import { SaveGameButton } from "./SaveGameButton";
 
-export const AddGameDialog = () => {
+interface AddGameDialogProps {
+  onGameAdded?: () => void;
+}
+
+export const AddGameDialog = ({ onGameAdded }: AddGameDialogProps) => {
   const [gameName, setGameName] = useState("");
   const [description, setDescription] = useState("");
   const [gameUrl, setGameUrl] = useState("");
@@ -22,43 +26,45 @@ export const AddGameDialog = () => {
       const folderName = gameName.toLowerCase().replace(/\s+/g, '-');
       const gameData = {
         title: gameName,
-        image: `${import.meta.env.VITE_SERVER_URL}/games/${folderName}/cover.png`,
+        image: `/games/${folderName}/cover.png`,
         description: description,
         url: gameUrl || undefined
       };
 
-      console.log('Attempting to save game with data:', gameData);
+      console.log('Adding game to local storage:', gameData);
 
-      const response = await fetch(`${import.meta.env.VITE_SERVER_URL}/save-game.php`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(gameData),
-      });
+      // Get existing games from localStorage or default to empty array
+      const existingGames = JSON.parse(localStorage.getItem('games') || '[]');
+      
+      // Add new game to the list
+      const updatedGames = [...existingGames, gameData];
+      
+      // Save to localStorage
+      localStorage.setItem('games', JSON.stringify(updatedGames));
 
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.error || 'Failed to save game card');
-      }
-
-      console.log('Server response:', data);
+      console.log('Game added successfully to localStorage');
 
       toast({
         title: "Success",
-        description: "Game card has been saved successfully.",
+        description: "Game card has been added successfully!",
       });
+
+      // Reset form
+      setGameName("");
+      setDescription("");
+      setGameUrl("");
+
+      // Notify parent component to refresh games list
+      if (onGameAdded) {
+        onGameAdded();
+      }
     } catch (error) {
       console.error('Error details:', error);
       
-      let errorMessage = 'Failed to save game card. Please check:';
-      errorMessage += '\n1. The game folder exists at /games/[game-name]';
-      errorMessage += '\n2. The cover.png file exists in the game folder';
-      errorMessage += '\n3. File permissions are set correctly';
+      let errorMessage = 'Failed to add game card. Please try again.';
       
       if (error instanceof Error) {
-        errorMessage += `\n\nServer message: ${error.message}`;
+        errorMessage += `\n\nError: ${error.message}`;
       }
 
       toast({
